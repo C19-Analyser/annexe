@@ -68,17 +68,19 @@ def compare(dataset,liste):
     FileNorme = []
 
     try:
-        with open(liste,"r") as lecture:
+        with open(liste,'r') as lecture:
             taille = lecture.readline()
+
             if(taille.find("DIR:") == -1):
                 print("Le fichier n'est pas conforme.")
                 sys.exit(0)
             else:
                 count = taille[4] if taille[4].isdigit() else print("Erreur fichier non conforme.")
 
-            if(count != 0):
-                for i in range(count):
-                    DirectoryNorme.append(lecture.readline())
+            if(int(count) != 0):
+                for i in range(int(count)):
+                    line = lecture.readline()
+                    DirectoryNorme.append(line[0:-1])
             else:
                 print("Fichier non conforme ou vide.")
                 sys.exit(0)
@@ -86,15 +88,19 @@ def compare(dataset,liste):
             count = 0
 
             taille = lecture.readline()
+
             if(taille.find("FILE:") == -1):
                 print("Le fichier n'est pas conforme.")
                 sys.exit(0)
             else:
-                count = taille[4] if taille[4].isdigit() else print("Erreur fichier non conforme.")
+                end = taille.find("\n")
+                value = taille[5:end]
+                count = value if value.isdigit() else print("Erreur fichier non conforme.")
 
-            if(count != 0):
-                for i in range(count):
-                    DirectoryNorme.append(lecture.readline())
+            if(int(count) != 0):
+                for i in range(int(count)):
+                    line = lecture.readline()
+                    FileNorme.append(line[0:-1])
             else:
                 print("Fichier non conforme ou vide.")
                 sys.exit(0)
@@ -124,6 +130,7 @@ def compare(dataset,liste):
         print("Attention il n'y pas le nombre de fichier attendu.")
         if(len(FileNorme) > len(FileTest)):
             totalError = len(FileNorme) - len(FileTest)
+            print("Il y a " + str(totalError) + " erreur reperer.")
             print("Il y a moins de fichier dans le dataset que dans la liste.")
 
             for element in FileNorme:
@@ -140,17 +147,18 @@ def compare(dataset,liste):
             print("Verification terminer.")
         else:
             totalError = len(FileTest) - len(FileNorme)
+            print("Il y a " + str(totalError) + " erreur reperer.")
             print("Il y a plus de fichier que dans la liste.")
 
             for element in FileTest:
                 if(element not in FileNorme):
                     error = error + 1
-                    print("! ==> Le fichier suivant est en trop :")
+                    print("! ==> Le fichier suivant est en trop :" + str(element))
 
             if(error != totalError):
                 print("Il a egalement des fichiers manquant dans le dataset :")
-                for element in FileTest:
-                    if(element not in FileNorme):
+                for element in FileNorme:
+                    if(element not in FileTest):
                         print("! ==> Le fichier suivant est manquant :" + str(element))
             
             print("Verification terminer.")
@@ -186,8 +194,7 @@ if __name__ == "__main__":
             print("Erreur d'utilisation. Tapez --help pour affiche le menu d'aide")
     else:
         if sys.argv[1] == "-compare":
-            #compare(sys.argv[2],sys.argv[3])
-            print("On construt")
+            compare(sys.argv[2],sys.argv[3])
         elif sys.argv[1] == "-extract":
             creerListe(sys.argv[2],sys.argv[3])
         else:
