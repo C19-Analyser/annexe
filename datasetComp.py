@@ -188,7 +188,7 @@ def usage():
 if __name__ == "__main__":
 
     if(len(sys.argv) < 3):
-        if(sys.arv[1] == "--hep"):
+        if(sys.argv[1] == "--help"):
             usage()
         else:
             print("Erreur d'utilisation. Tapez --help pour affiche le menu d'aide")
