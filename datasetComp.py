@@ -61,6 +61,109 @@ def creerListe(source,sortie):
 
     print("==> Fin du programme.")
     
+def compare(dataset,liste):
+    
+    DirectoryNorme = []
+    count = 0
+    FileNorme = []
+
+    try:
+        with open(liste,"r") as lecture:
+            taille = lecture.readline()
+            if(taille.find("DIR:") == -1):
+                print("Le fichier n'est pas conforme.")
+                sys.exit(0)
+            else:
+                count = taille[4] if taille[4].isdigit() else print("Erreur fichier non conforme.")
+
+            if(count != 0):
+                for i in range(count):
+                    DirectoryNorme.append(lecture.readline())
+            else:
+                print("Fichier non conforme ou vide.")
+                sys.exit(0)
+            
+            count = 0
+
+            taille = lecture.readline()
+            if(taille.find("FILE:") == -1):
+                print("Le fichier n'est pas conforme.")
+                sys.exit(0)
+            else:
+                count = taille[4] if taille[4].isdigit() else print("Erreur fichier non conforme.")
+
+            if(count != 0):
+                for i in range(count):
+                    DirectoryNorme.append(lecture.readline())
+            else:
+                print("Fichier non conforme ou vide.")
+                sys.exit(0)
+    except:
+        print("Erreur lors de l'ouverture fichier. Verifier le chemin donne.")
+        sys.exit(0)
+     
+    DirectoryTest = []
+    FileTest = []
+
+    try:
+        for dirname, _, filenames in os.walk(dataset):
+            DirectoryTest.append(dirname)
+            for filename in filenames:
+                if(filename.find(".icloud") != -1):
+                    print("N'utiliser pas de solution cloud. Fin du programme.")
+                    sys.exit(0)
+                else:
+                    FileTest.append(os.path.join(dirname, filename))
+    except:
+        print("Erreur lors du parcours du dataset. Verifier le chemin.")
+
+    totalError = 0
+    error = 0
+
+    if(len(FileNorme) != len(FileTest)):
+        print("Attention il n'y pas le nombre de fichier attendu.")
+        if(len(FileNorme) > len(FileTest)):
+            totalError = len(FileNorme) - len(FileTest)
+            print("Il y a moins de fichier dans le dataset que dans la liste.")
+
+            for element in FileNorme:
+                if(element not in FileTest):
+                    error = error + 1
+                    print("! ==> Le fichier suivant est manquant : " + str(element))
+
+            if(error != totalError):
+                print("Il a egalement des fichiers en trop dans le dataset :")
+                for element in FileTest:
+                    if(element not in FileNorme):
+                        print("! ==> Le fichier suivant est en trop :" + str(element))
+
+            print("Verification terminer.")
+        else:
+            totalError = len(FileTest) - len(FileNorme)
+            print("Il y a plus de fichier que dans la liste.")
+
+            for element in FileTest:
+                if(element not in FileNorme):
+                    error = error + 1
+                    print("! ==> Le fichier suivant est en trop :")
+
+            if(error != totalError):
+                print("Il a egalement des fichiers manquant dans le dataset :")
+                for element in FileTest:
+                    if(element not in FileNorme):
+                        print("! ==> Le fichier suivant est manquant :" + str(element))
+            
+            print("Verification terminer.")
+    
+    elif(len(DirectoryNorme) != len(DirectoryTest)):
+        print("Attention votre architecture comporte plus de dossier que prevu.")
+        print("L'architecture attentdu est :")
+        for element in DirectoryNorme:
+            print(str(element))
+
+    else:
+        print("Pas d'erreur.")
+
 
 def usage():
     print("=================================================================================================")
@@ -71,6 +174,7 @@ def usage():
     print("1 ) #~python3 datasetComp.py -compare <chemin du datasets a verifier> <chemin du fchier de comparaison> ")
     print("2 ) #~python3 datasetComp.py -extract <chemin du datasets a scanner> <chemin et nom du fichier contenant la liste>")
     print("#~python3 datasetComp.py --help              Affiche ce menu.")
+    print("Il est preferable d'utiliser des chemins relatif.")
     print("=================================================================================================")
 
 if __name__ == "__main__":
